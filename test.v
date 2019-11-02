@@ -1,7 +1,8 @@
 module main
 
 fn print_name(req Request) string {
-	return 'Hello, ${req.params['name']}'
+	name := req.params['name']
+	return 'Hello, $name'
 }
 
 fn main() {
