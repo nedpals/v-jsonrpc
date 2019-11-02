@@ -38,7 +38,8 @@ mut:
     params string [raw]
 }
 
-struct Request {
+pub struct Request {
+pub:
     jsonrpc string
     id int
     method string
@@ -46,7 +47,7 @@ mut:
     params map[string]string
 }
 
-struct Response {
+pub struct Response {
     jsonrpc string
 mut:
     id int
@@ -61,7 +62,8 @@ mut:
     data string
 }
 
-struct Server {
+pub struct Server {
+pub:
 	port int
 mut:
 	procs []Procedure
