@@ -42,7 +42,7 @@ struct RawRequest {
     id int
     method string
 mut:
-	// headers []Header [skip]
+	headers []Header [skip]
     params string [raw]
 }
 
