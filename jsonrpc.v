@@ -3,7 +3,7 @@ module main
 import net
 import json
 
-const (
+pub const (
     JRPC_PARSE_ERROR = -32700
     JRPC_INVALID_REQUEST = -32600
     JRPC_METHOD_NOT_FOUND = -32601
@@ -13,10 +13,10 @@ const (
     JRPC_SERVER_ERROR_END = -32600
     JRPC_SERVER_NOT_INITIALIZED = -32002
     JRPC_UNKNOWN_ERROR_CODE = -32001
-    // JRPC_LSP_REQUEST_CANCELLED = -32800
-    // JRPC_LSP_CONTENT_MODIFIED = -32801
+)
+
+const (
     JRPC_VERSION = '2.0'
-    JRPC_PORT = 8042
 )
 
 struct Header {
