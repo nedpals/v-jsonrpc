@@ -7,7 +7,7 @@ Basic JSON-RPC server written on V.
 v install nedpals.jsonrpc
 ```
 
-### VPM
+### [vpkg](https://github.com/vpkg-project/vpkg)
 ```
 vpkg get v-jsonrpc
 ```
