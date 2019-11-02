@@ -186,6 +186,6 @@ fn (server mut Server) register_procedure(method_name string, proc_func fn (Requ
 	server.procs << proc
 }
 
-fn new_jrpc(port_num int) Server {
+pub fn new(port_num int) Server {
 	return Server{ port: port_num, procs: []Procedure }
 }
