@@ -127,7 +127,7 @@ fn (server Server) proc_index(name string) int {
 	return -1
 }
 
-fn (server Server) start() {
+pub fn (server Server) start_and_listen() {
 	listener := net.listen(server.port) or {panic('Failed to listen to port ${server.port}')}
 	for {
 		mut res := Response{ jsonrpc: JRPC_VERSION }
