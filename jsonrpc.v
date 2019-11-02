@@ -2,6 +2,7 @@ module main
 
 import net
 import json
+import log
 
 pub const (
     JRPC_PARSE_ERROR = -32700
@@ -76,10 +77,14 @@ mut:
 	procs []Procedure
 }
 
-fn (res mut Response) send_error(err_code int) {
+pub fn (res mut Response) send_error(err_code int) {
 	mut error := ResponseError{ code: err_code, data: '' }
+	error.message = err_message(err_code)
+	res.error = error
+}
 
-	error.message = match err_code {
+fn err_message(err_code int) string {
+	msg := match err_code {
 		JRPC_PARSE_ERROR { 'Invalid JSON' }
 		JRPC_INVALID_PARAMS { 'Invalid params.' }
 		JRPC_INVALID_REQUEST { 'Invalid request.' }
@@ -90,7 +95,7 @@ fn (res mut Response) send_error(err_code int) {
 		else { 'Unknown error.' }
 	}
 
-	res.error = error
+	return msg
 }
 
 fn (res Response) json() string {
