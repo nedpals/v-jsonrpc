@@ -143,7 +143,7 @@ pub fn (server Server) start_and_listen() {
 	listener := net.listen(server.port) or {panic('Failed to listen to port ${server.port}')}
 	mut log := log.Log{ level: 4, output: 'terminal' }
 
-	log.info('JSON-RPC Server has started on ${server.port}')
+	log.info('JSON-RPC Server has started on port ${server.port}')
 	for {
 		mut res := Response{ jsonrpc: JRPC_VERSION }
 		conn := listener.accept() or {
