@@ -18,8 +18,8 @@ module main
 
 import jsonrpc // or 'import nedpals.jsonrpc' for vpm
 
-// Function we will gonna use for "printName" procedure.
-fn say_hello(req jsonrpc.Context) string {
+// Function we will gonna use for the "printName" procedure.
+fn say_hello(ctx jsonrpc.Context) string {
 	name := ctx.req.params['name']
 	return 'Hello, $name'
 }
@@ -38,7 +38,9 @@ fn main() {
 
 ```bash
 $ v run jrpc.v
-
+[I 2019-11-02 23:14:01] JSON-RPC Server has started on 8046
+[E 2019-11-02 23:14:03] [ID: 1][dummy] Invalid request.
+[I 2019-11-02 23:14:06] [ID: 0][printName] Procedure triggered.
 ```
 
 ### Error Handling
@@ -77,7 +79,7 @@ pub const (
 ```
 
 ## Limitations / Caveats
-- Generic structs were not yet implemented. For now, it uses the `map[string]string{}` type for the params.
+- Generic structs were not implemented yet. For now, it uses the `map[string]string{}` type for the params.
 - Parsing `params` are not directly parsed to a map. Instead it goes to `RawRequest` first then converts the raw string into map and puts them into `Request`. May incur performance penalties.
 - Responses may still have an `error` field regardless if the request was successful or not.
 - Segmentation faults when triggering errors.
