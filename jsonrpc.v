@@ -126,7 +126,7 @@ fn (server Server) proc_index(name string) int {
 }
 
 fn (server Server) start() {
-	listener := net.listen(server.port) or {panic("Failed to listen to port ${server.port}")}
+	listener := net.listen(server.port) or {panic('Failed to listen to port ${server.port}')}
 	for {
 		mut res := Response{ jsonrpc: JRPC_VERSION }
 		conn := listener.accept() or {
@@ -164,7 +164,7 @@ fn (server Server) start() {
 	}
 }
 
-fn (server mut Server) register_procedure(method_name string, proc_func fn(Request, RawRequest) string) {
+fn (server mut Server) register_procedure(method_name string, proc_func fn (Request) string) {
 	proc := Procedure{ name: method_name, func: proc_func }
 	server.procs << proc
 }
