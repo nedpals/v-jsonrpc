@@ -84,7 +84,7 @@ pub const (
 - This is still a **BASIC** implementation of the JSON-RPC server.
 
 ## Notes
-Special huge thanks to [spytheman](https://github.com/spytheman/) for reviewing fixing the code!
+Special huge thanks to [spytheman](https://github.com/spytheman/) for reviewing and fixing the code!
 
 ## Contributing
 1. Fork it (<https://github.com/nedpals/v-jsonrpc/fork>)
