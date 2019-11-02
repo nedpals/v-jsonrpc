@@ -1,4 +1,4 @@
-module main
+module jsonrpc
 
 import net
 import json
@@ -186,7 +186,7 @@ pub fn (server Server) start_and_listen() {
 		ctx := Context{res: res, req: req, raw: raw_req}
 
 		if proc_idx != -1 {
-		invoke_proc := server.procs[proc_idx].func
+			invoke_proc := server.procs[proc_idx].func
 			proc_name := server.procs[proc_idx].name
 			res.result = invoke_proc(ctx)
 			log.set_level(4)
