@@ -19,6 +19,13 @@ const (
     JRPC_VERSION = '2.0'
 )
 
+pub struct Context {
+pub mut:
+	res Response
+	req Request
+	raw RawRequest
+}
+
 struct Header {
 	name string
 	value string
@@ -26,7 +33,7 @@ struct Header {
 
 struct Procedure {
 	name string
-	func fn (Request) string
+	func fn (Context) string
 }
 
 struct RawRequest {
@@ -170,18 +177,27 @@ pub fn (server Server) start_and_listen() {
 
 		res.id = req.id
 		proc_idx := server.proc_index(req.method)
+
+		ctx := Context{res: res, req: req, raw: raw_req}
+
+		if proc_idx != -1 {
 		invoke_proc := server.procs[proc_idx].func
+			proc_name := server.procs[proc_idx].name
+			res.result = invoke_proc(ctx)
 			log.set_level(4)
 			log.info('[ID: ${req.id}][${req.method}] Procedure triggered.')
+		} else {
 			log.set_level(2)
 			log.error('[ID: ${req.id}][${req.method}] ' + err_message(JRPC_INVALID_REQUEST))
 			res.send_error(JRPC_INVALID_REQUEST)
+		}
+
 		res.send(conn)
 		conn.close()
 	}
 }
 
-fn (server mut Server) register_procedure(method_name string, proc_func fn (Request) string) {
+pub fn (server mut Server) register_procedure(method_name string, proc_func fn (Context) string) {
 	proc := Procedure{ name: method_name, func: proc_func }
 	server.procs << proc
 }
