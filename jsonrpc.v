@@ -129,9 +129,14 @@ fn (server Server) proc_index(name string) int {
 
 pub fn (server Server) start_and_listen() {
 	listener := net.listen(server.port) or {panic('Failed to listen to port ${server.port}')}
+	mut log := log.Log{ level: 4, output: 'terminal' }
+
+	log.info('JSON-RPC Server has started on ${server.port}')
 	for {
 		mut res := Response{ jsonrpc: JRPC_VERSION }
 		conn := listener.accept() or {
+			log.set_level(1)
+			log.error(err_message(JRPC_SERVER_ERROR_START))
 			res.send_error(JRPC_SERVER_ERROR_START)
 			return
 		}
@@ -139,6 +144,8 @@ pub fn (server Server) start_and_listen() {
 		vals := s.split_into_lines()
 		content := vals[vals.len-1]
 		raw_req := json.decode(RawRequest, content) or {
+			log.set_level(2)
+			log.error(err_message(JRPC_INVALID_REQUEST))
 			res.send_error(JRPC_INVALID_REQUEST)
 			conn.close()
 			return
@@ -146,12 +153,16 @@ pub fn (server Server) start_and_listen() {
 		req := process_request(raw_req) 
 
 		if s == '' {
+			log.set_level(2)
+			log.error(err_message(JRPC_INTERNAL_ERROR))
 			res.send_error(JRPC_INTERNAL_ERROR)
 			conn.close()
 			return
 		}
 
 		if vals.len < 2 {
+			log.set_level(2)
+			log.error(err_message(JRPC_INVALID_REQUEST))
 			res.send_error(JRPC_INVALID_REQUEST)
 			conn.close()
 			return
@@ -160,7 +171,11 @@ pub fn (server Server) start_and_listen() {
 		res.id = req.id
 		proc_idx := server.proc_index(req.method)
 		invoke_proc := server.procs[proc_idx].func
-		res.result = invoke_proc(req)
+			log.set_level(4)
+			log.info('[ID: ${req.id}][${req.method}] Procedure triggered.')
+			log.set_level(2)
+			log.error('[ID: ${req.id}][${req.method}] ' + err_message(JRPC_INVALID_REQUEST))
+			res.send_error(JRPC_INVALID_REQUEST)
 		res.send(conn)
 		conn.close()
 	}
