@@ -7,15 +7,15 @@ import (
 )
 
 pub const (
-    JRPC_PARSE_ERROR = -32700
-    JRPC_INVALID_REQUEST = -32600
-    JRPC_METHOD_NOT_FOUND = -32601
-    JRPC_INVALID_PARAMS = -32602
-    JRPC_INTERNAL_ERROR = -32693    
-    JRPC_SERVER_ERROR_START = -32099
-    JRPC_SERVER_ERROR_END = -32600
-    JRPC_SERVER_NOT_INITIALIZED = -32002
-    JRPC_UNKNOWN_ERROR_CODE = -32001
+    PARSE_ERROR = -32700
+    INVALID_REQUEST = -32600
+    METHOD_NOT_FOUND = -32601
+    INVALID_PARAMS = -32602
+    INTERNAL_ERROR = -32693    
+    SERVER_ERROR_START = -32099
+    SERVER_ERROR_END = -32600
+    SERVER_NOT_INITIALIZED = -32002
+    UNKNOWN_ERROR = -32001
 )
 
 const (
@@ -87,13 +87,13 @@ pub fn (res mut Response) send_error(err_code int) {
 
 fn err_message(err_code int) string {
 	msg := match err_code {
-		JRPC_PARSE_ERROR { 'Invalid JSON' }
-		JRPC_INVALID_PARAMS { 'Invalid params.' }
-		JRPC_INVALID_REQUEST { 'Invalid request.' }
-		JRPC_METHOD_NOT_FOUND { 'Method not found.' }
-		JRPC_SERVER_ERROR_END { 'Error while stopping the server.' }
-		JRPC_SERVER_NOT_INITIALIZED { 'Server not yet initialized.' }
-		JRPC_SERVER_ERROR_START { 'Error while starting the server.' }
+		PARSE_ERROR { 'Invalid JSON' }
+		INVALID_PARAMS { 'Invalid params.' }
+		INVALID_REQUEST { 'Invalid request.' }
+		METHOD_NOT_FOUND { 'Method not found.' }
+		SERVER_ERROR_END { 'Error while stopping the server.' }
+		SERVER_NOT_INITIALIZED { 'Server not yet initialized.' }
+		SERVER_ERROR_START { 'Error while starting the server.' }
 		else { 'Unknown error.' }
 	}
 
@@ -149,9 +149,9 @@ pub fn (server Server) start_and_listen() {
 	for {
 		mut res := Response{ jsonrpc: JRPC_VERSION }
 		conn := listener.accept() or {
-			log.set_level(1)
-			log.error(err_message(JRPC_SERVER_ERROR_START))
-			res.send_error(JRPC_SERVER_ERROR_START)
+			logg.set_level(1)
+			logg.error(err_message(SERVER_ERROR_START))
+			res.send_error(SERVER_ERROR_START)
 			return
 		}
 		s := conn.read_line()
@@ -167,19 +167,12 @@ pub fn (server Server) start_and_listen() {
 		req := process_request(raw_req) 
 
 		if s == '' {
-			log.set_level(2)
-			log.error(err_message(JRPC_INTERNAL_ERROR))
-			res.send_error(JRPC_INTERNAL_ERROR)
-			conn.close()
-			return
+			logg.set_level(2)
+			logg.error(err_message(INTERNAL_ERROR))
+			res.send_error(INTERNAL_ERROR)
 		}
 
-		if vals.len < 2 {
-			log.set_level(2)
-			log.error(err_message(JRPC_INVALID_REQUEST))
-			res.send_error(JRPC_INVALID_REQUEST)
-			conn.close()
-			return
+		if content == '{}' || content == '' || vals.len < 2 {
 		}
 
 		res.id = req.id
@@ -191,12 +184,7 @@ pub fn (server Server) start_and_listen() {
 			invoke_proc := server.procs[proc_idx].func
 			proc_name := server.procs[proc_idx].name
 			res.result = invoke_proc(ctx)
-			log.set_level(4)
-			log.info('[ID: ${req.id}][${req.method}] Procedure triggered.')
-		} else {
-			log.set_level(2)
-			log.error('[ID: ${req.id}][${req.method}] ' + err_message(JRPC_INVALID_REQUEST))
-			res.send_error(JRPC_INVALID_REQUEST)
+			logg.set_level(4)
 		}
 
 		res.send(conn)
