@@ -29,11 +29,6 @@ pub mut:
 	raw RawRequest
 }
 
-struct Header {
-	name string
-	value string
-}
-
 struct Procedure {
 	name string
 	func fn (Context) string
@@ -46,11 +41,11 @@ struct Procedure {
 // }
 
 struct RawRequest {
+mut:
     jsonrpc string
     id int
     method string
-mut:
-	headers []Header [skip]
+	headers map[string]string [skip]
     params string [raw]
 }
 
