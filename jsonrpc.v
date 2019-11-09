@@ -246,10 +246,11 @@ pub fn (server mut Server) start_and_listen(port_num int) {
 			proc_name := server.procs[proc_idx].name
 			res.result = invoke_proc(ctx)
 			logg.set_level(4)
+			logg.info('[ID: ${req.id}][${req.method}] ${raw_req.params}')
 		}
 
 		res.send(conn)
-		conn.close()
+		conn.close() or { return }
 	}
 }
 
