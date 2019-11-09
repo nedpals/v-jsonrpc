@@ -1,5 +1,5 @@
 # V-JSONRPC
-Basic JSON-RPC server written on V.
+Basic JSON-RPC 2.0-compliant server written on V.
 
 ## Install
 ### VPM
@@ -25,14 +25,14 @@ fn say_hello(ctx jsonrpc.Context) string {
 }
 
 fn main() {
-    // Initialize and specify port
-    jrpc := jsonrpc.new(8046)
+    // Initialize
+    jrpc := jsonrpc.new()
 
     // Register procedures. Equivalent of "endpoints" if you are on REST/HTTP
     jrpc.register_procedure('printName', say_hello)
 
-    // Start the server!
-    jrpc.start_and_listen()
+    // Specify port and tart the server!
+    jrpc.start_and_listen(8046)
 }
 ```
 
@@ -47,21 +47,21 @@ $ v run jrpc.v
 V-JSONRPC includes basic error handling as well as a set of public constants for easy use.
 ```golang
 pub const (
-    JRPC_PARSE_ERROR = -32700
-    JRPC_INVALID_REQUEST = -32600
-    JRPC_METHOD_NOT_FOUND = -32601
-    JRPC_INVALID_PARAMS = -32602
-    JRPC_INTERNAL_ERROR = -32693    
-    JRPC_SERVER_ERROR_START = -32099
-    JRPC_SERVER_ERROR_END = -32600
-    JRPC_SERVER_NOT_INITIALIZED = -32002
-    JRPC_UNKNOWN_ERROR_CODE = -32001
+    PARSE_ERROR = -32700
+    INVALID_REQUEST = -32600
+    METHOD_NOT_FOUND = -32601
+    INVALID_PARAMS = -32602
+    INTERNAL_ERROR = -32693    
+    SERVER_ERROR_START = -32099
+    SERVER_ERROR_END = -32600
+    SERVER_NOT_INITIALIZED = -32002
+    UNKNOWN_ERROR_CODE = -32001
 )
 ```
 
 ```golang
 //... Function context must be mutable. e.g fn proc_name(ctx mut jsonrpc.Context)
-    ctx.res.send_error(jsonrpc.JRPC_INVALID_REQUEST)
+    ctx.res.send_error(jsonrpc.INVALID_REQUEST)
 //...
 ```
 
@@ -73,15 +73,14 @@ pub const (
         "code":-32600,
         "message":"Invalid request.",
         "data":""
-    },
-    "result":""
+    }
 }
 ```
 
 ## Limitations / Caveats
 - Generic structs were not implemented yet. For now, it uses the `map[string]string{}` type for the params.
-- Parsing `params` are not directly parsed to a map. Instead it goes to `RawRequest` first then converts the raw string into map and puts them into `Request`. May incur performance penalties.
-- Responses may still have an `error` field regardless if the request was successful or not.
+- Parsing `params` are not directly parsed to a map. Instead it goes to `RawRequest` first then converts the raw string into a map and puts them into `Request`. May incur performance penalties.
+- ~~ Responses may still have an `error` field regardless if the request was successful or not.~~
 - Segmentation faults when triggering errors.
 - This is still a **BASIC** implementation of the JSON-RPC server.
 
