@@ -39,6 +39,12 @@ struct Procedure {
 	func fn (Context) string
 }
 
+// struct Procedure<T> {
+// 	name string
+// 	func fn (Context) string
+// 	result T
+// }
+
 struct RawRequest {
     jsonrpc string
     id int
@@ -57,6 +63,15 @@ mut:
     params map[string]string
 }
 
+// pub struct Request<T> {
+// pub:
+//     jsonrpc string
+//     id int
+//     method string
+// mut:
+//     params T
+// }
+
 pub struct Response {
     jsonrpc string
 mut:
@@ -64,6 +79,14 @@ mut:
     error ResponseError [json:error]
     result string
 }
+
+// pub struct Response<T> {
+//     jsonrpc string
+// mut:
+//     id int
+//     error ResponseError [json:error]
+//     result T
+// }
 
 struct ResponseError {
 mut:
@@ -221,6 +244,7 @@ pub fn (server mut Server) start_and_listen(port_num int) {
 	}
 }
 
+// pub fn (server mut Server) register_procedure<T,U>(method_name string, proc_func fn (Context) T, result_typ U)
 pub fn (server mut Server) register_procedure(method_name string, proc_func fn (Context) string) {
 	proc := Procedure{ name: method_name, func: proc_func }
 	server.procs << proc
