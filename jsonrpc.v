@@ -141,7 +141,22 @@ fn (server Server) proc_index(name string) int {
 	return -1
 }
 
-pub fn (server Server) start_and_listen() {
+fn process_raw_request(json_str string, raw_contents string) RawRequest {
+	mut raw_req := RawRequest{}
+	raw_req.headers = http.parse_headers(raw_contents.split_into_lines())
+
+	if json_str == '{}' {
+		return raw_req
+	} else {
+		from_json := json.decode(RawRequest, json_str) or { return raw_req }
+		raw_req.jsonrpc = from_json.jsonrpc
+		raw_req.id = from_json.id
+		raw_req.method = from_json.method
+		raw_req.params = from_json.params
+	}
+
+	return raw_req
+}
 	listener := net.listen(server.port) or {panic('Failed to listen to port ${server.port}')}
 	mut log := log.Log{ level: 4, output: 'terminal' }
 
@@ -157,13 +172,7 @@ pub fn (server Server) start_and_listen() {
 		s := conn.read_line()
 		vals := s.split_into_lines()
 		content := vals[vals.len-1]
-		raw_req := json.decode(RawRequest, content) or {
-			log.set_level(2)
-			log.error(err_message(JRPC_INVALID_REQUEST))
-			res.send_error(JRPC_INVALID_REQUEST)
-			conn.close()
-			return
-		}
+		raw_req := process_raw_request(content, s)
 		req := process_request(raw_req) 
 
 		if s == '' {
