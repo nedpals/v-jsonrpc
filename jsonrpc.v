@@ -1,8 +1,10 @@
 module jsonrpc
 
-import net
-import json
-import log
+import (
+	net
+	json
+	log
+)
 
 pub const (
     JRPC_PARSE_ERROR = -32700
