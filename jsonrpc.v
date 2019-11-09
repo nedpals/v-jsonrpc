@@ -73,9 +73,8 @@ mut:
 }
 
 pub struct Server {
-pub:
-	port int
 mut:
+	port int
 	procs []Procedure
 }
 
@@ -157,10 +156,14 @@ fn process_raw_request(json_str string, raw_contents string) RawRequest {
 
 	return raw_req
 }
-	listener := net.listen(server.port) or {panic('Failed to listen to port ${server.port}')}
-	mut log := log.Log{ level: 4, output: 'terminal' }
 
-	log.info('JSON-RPC Server has started on port ${server.port}')
+pub fn (server mut Server) start_and_listen(port_num int) {
+	server.port = port_num
+
+	listener := net.listen(server.port) or {panic('Failed to listen to port ${server.port}')}
+	mut logg := log.Log{ level: 4, output: 'terminal' }
+
+	logg.info('JSON-RPC Server has started on port ${server.port}')
 	for {
 		mut res := Response{ jsonrpc: JRPC_VERSION }
 		conn := listener.accept() or {
@@ -189,7 +192,6 @@ fn process_raw_request(json_str string, raw_contents string) RawRequest {
 
 		res.id = req.id
 		proc_idx := server.proc_index(req.method)
-
 		ctx := Context{res: res, req: req, raw: raw_req}
 
 		if proc_idx != -1 {
@@ -209,6 +211,6 @@ pub fn (server mut Server) register_procedure(method_name string, proc_func fn (
 	server.procs << proc
 }
 
-pub fn new(port_num int) Server {
-	return Server{ port: port_num, procs: []Procedure }
+pub fn new() Server {
+	return Server{ port: 8046, procs: []Procedure }
 }
