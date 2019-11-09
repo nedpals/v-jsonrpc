@@ -99,6 +99,21 @@ fn err_message(err_code int) string {
 	return msg
 }
 
+fn find_between(s string, start, end string) string {
+	start_pos := s.index(start)
+	if start_pos == -1 {
+		return ''
+	}
+
+	val := s.right(start_pos + start.len)
+	end_pos := val.last_index(end)
+	if end_pos == -1 {
+		return val
+	}
+	return val.left(end_pos)
+}
+
+
 fn (res Response) json() string {
 	return json.encode(res)
 }
@@ -117,7 +132,7 @@ fn (res &Response) send(conn net.Socket) {
 
 fn process_request(raw_req RawRequest) Request {
 	mut req := Request{JRPC_VERSION, raw_req.id, raw_req.method, map[string]string}
-	params_arr := raw_req.params.find_between('{', '}').split(',')
+	params_arr := find_between(raw_req.params, '{', '}').split(',')
 
 	for pkv in params_arr {
 		p := pkv.split(':')
