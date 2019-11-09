@@ -138,7 +138,21 @@ fn find_between(s string, start, end string) string {
 
 
 fn (res Response) json() string {
-	return json.encode(res)
+	mut res_json_arr := []string
+
+	res_json_arr << '"jsonrpc":"${res.jsonrpc}"'
+	
+	if res.id != 0 {
+		res_json_arr << '"id":${res.id}'
+	}
+
+	if res.error.message.len != 0 {
+		res_json_arr << '"error": {"code":${res.error.code},"message":"${res.error.message}","data":"${res.error.data}"}'
+	} else {
+		res_json_arr << '"result":"${res.result}"'
+	}
+
+	return '{' + res_json_arr.join(',') + '}'
 }
 
 fn (err ResponseError) str() string {
