@@ -182,6 +182,9 @@ fn process_raw_request(json_str string, raw_contents string) RawRequest {
 		}
 
 		if content == '{}' || content == '' || vals.len < 2 {
+			logg.set_level(2)
+			logg.error(err_message(INVALID_REQUEST))
+			res.send_error(INVALID_REQUEST)
 		}
 
 		res.id = req.id
