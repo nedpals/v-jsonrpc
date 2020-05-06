@@ -13,7 +13,7 @@ vpkg get v-jsonrpc
 ```
 
 ## Example
-This code example is taken from the `[stdin_example.v](examples/stdin_example.v)` which uses a standard input (STDIN) as the main source for calling procedures.
+This code example is taken from the [`stdin_example.v`](examples/stdin_example.v) which uses a standard input (STDIN) as the main source for calling procedures.
 
 ```v
 fn emit_error(err_code int) Response {
@@ -94,7 +94,7 @@ fn get_person(ctx mut Context) string {
 ## Migration from `0.1`
 V-JSONRPC 0.2 is different from the previous version when it comes to the function names and the way it is used. If you are using the previous version of V-JSONRPC and want to migrate to the new version, you should do the following:
 
-- The built-in TCP server has been removed and. Use the code from the `[tcp_example.v](examples/tcp_example.v)` to use V-JSONRPC via TCP.
+- The built-in TCP server has been removed and. Use the code from the [`tcp_example.v`](examples/tcp_example.v) to use V-JSONRPC via TCP.
 - `register_procedure` is now `register`.
 
 ## Special thanks
