@@ -1,5 +1,5 @@
 # V-JSONRPC
-Basic JSON-RPC 2.0-compliant server written on V.
+A basic JSON-RPC 2.0-compliant server written on V. V-JSONRPC 0.2 is now transfer protocol-independent meaning it is not tied to one protocol and it can now be used in other ways such as STDIN, TCP, UDP and more provided that the provided input is a string.
 
 ## Install
 ### VPM
@@ -12,35 +12,37 @@ v install nedpals.jsonrpc
 vpkg get v-jsonrpc
 ```
 
-## Usage
-```golang
-module main
+## Example
+This code example is taken from the `[stdin_example.v](examples/stdin_example.v)` which uses a standard input (STDIN) as the main source for calling procedures.
 
-import jsonrpc // or 'import nedpals.jsonrpc' for vpm
+```v
+fn emit_error(err_code int) Response {
+	mut eres := Response{}
+	eres.send_error(err_code)
+    return eres
+}
 
-// Function we will gonna use for the "printName" procedure.
-fn say_hello(ctx jsonrpc.Context) string {
-	name := ctx.req.params['name']
-	return 'Hello, $name'
+fn greet_person(ctx mut Context) string {
+    name := jsonrpc.as_string(ctx.req.params)
+    return 'Hello, $name'
 }
 
 fn main() {
-    // Initialize
-    jrpc := jsonrpc.new()
+    srv := jsonrpc.new()
+    srv.register('greet', greet_person)
 
-    // Register procedures. Equivalent of "endpoints" if you are on REST/HTTP
-    jrpc.register_procedure('printName', say_hello)
+    for {
+        line := os.get_line()
+        res := srv.exec(line) or { 
+            err_code := err.int()
+            eres := emit_error(err_code)
+            println(eres.gen_json())
+            continue
+        }
 
-    // Specify port and tart the server!
-    jrpc.start_and_listen(8046)
+        println(res.gen_json())
+    }
 }
-```
-
-```bash
-$ v run jrpc.v
-[I 2019-11-02 23:14:01] JSON-RPC Server has started on 8046
-[E 2019-11-02 23:14:03] [ID: 1][dummy] Invalid request.
-[I 2019-11-02 23:14:06] [ID: 0][printName] Procedure triggered.
 ```
 
 ### Error Handling
@@ -59,9 +61,10 @@ pub const (
 )
 ```
 
-```golang
+```v
 //... Function context must be mutable. e.g fn proc_name(ctx mut jsonrpc.Context)
     ctx.res.send_error(jsonrpc.INVALID_REQUEST)
+    return 'error!'
 //...
 ```
 
@@ -77,14 +80,24 @@ pub const (
 }
 ```
 
-## Limitations / Caveats
-- Generic structs were not implemented yet. For now, it uses the `map[string]string{}` type for the params.
-- Parsing `params` are not directly parsed to a map. Instead it goes to `RawRequest` first then converts the raw string into a map and puts them into `Request`. May incur performance penalties.
-- ~~ Responses may still have an `error` field regardless if the request was successful or not.~~
-- Segmentation faults when triggering errors.
-- This is still a **BASIC** implementation of the JSON-RPC server.
+## Parameter/Payload Handling
+Due to the limitations of the language, the payload (aka the `param` key) is decoded as a raw string. This means that the parsing of data into its appropriate type must be done inside the procedure handler. For strings and primitive arrays (like `[]string`), V-JSONRPC provides functions for it (`as_array` for array and `as_string` for string).
 
-## Notes
+```v
+fn get_person(ctx mut Context) string {
+    // The params is manually decoded into the Person struct
+    person := json.decode(Person, ctx.req.params) or {}
+    return person.str()
+}
+```
+
+## Migration from `0.1`
+V-JSONRPC 0.2 is different from the previous version when it comes to the function names and the way it is used. If you are using the previous version of V-JSONRPC and want to migrate to the new version, you should do the following:
+
+- The built-in TCP server has been removed and. Use the code from the `[tcp_example.v](examples/tcp_example.v)` to use V-JSONRPC via TCP.
+- `register_procedure` is now `register`.
+
+## Special thanks
 Special huge thanks to [spytheman](https://github.com/spytheman/) for reviewing and fixing the code!
 
 ## Contributing
