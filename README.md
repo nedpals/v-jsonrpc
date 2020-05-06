@@ -17,8 +17,8 @@ This code example is taken from the [`stdin_example.v`](examples/stdin_example.v
 
 ```v
 fn emit_error(err_code int) Response {
-	mut eres := Response{}
-	eres.send_error(err_code)
+    mut eres := Response{}
+    eres.send_error(err_code)
     return eres
 }
 
