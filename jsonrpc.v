@@ -125,7 +125,7 @@ pub fn (srv Server) exec(incoming string) ?Response {
 		return error(invalid_req.str())
 	}
 
-	mut req := process_request(content, incoming)
+	mut req := process_request(content)
 	req.headers = http.parse_headers(incoming.split_into_lines())
 	mut res := Response{ id: req.id }
 	mut ctx := Context{res, req}
