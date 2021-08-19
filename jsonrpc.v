@@ -17,7 +17,7 @@ pub const (
     unknown_error = -32001
 )
 
-type ProcFunc = fn (ctx mut Context) string
+type ProcFunc = fn (mut ctx Context) string
 
 pub struct Context {
 pub mut:
@@ -54,7 +54,7 @@ mut:
 	procs map[string]ProcFunc = map[string]ProcFunc
 }
 
-pub fn (res mut Response) send_error(err_code int) {
+pub fn (mut res Response) send_error(err_code int) {
 	res.error = ResponseError{ 
 		code: err_code, 
 		data: '', 
@@ -128,11 +128,11 @@ pub fn (srv Server) exec(incoming string) ?Response {
 	mut req := process_request(content, incoming)
 	req.headers = http.parse_headers(incoming.split_into_lines())
 	mut res := Response{ id: req.id }
-	ctx := Context{res, req}
+	mut ctx := Context{res, req}
 
 	if req.method in srv.procs.keys() {
 		proc := srv.procs[req.method]
-		res.result = proc(ctx)
+		res.result = proc(mut ctx)
 	} else {
 		method_nf := method_not_found
 		return error(method_nf.str())
@@ -141,7 +141,7 @@ pub fn (srv Server) exec(incoming string) ?Response {
 	return res
 }
 
-pub fn (srv mut Server) register(name string, func ProcFunc) {
+pub fn (mut srv Server) register(name string, func ProcFunc) {
 	srv.procs[name] = func
 }
 
