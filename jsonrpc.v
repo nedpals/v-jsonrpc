@@ -105,7 +105,7 @@ pub fn (res &Response) gen_resp_text() string {
 	return 'Content-Length: ${js.len}\r\n\n${js}'
 }
 
-fn process_request(js_str string) Request {
+fn process_request(js_str string, incoming string) Request {
 	if js_str == '{}' { return Request{} }
 	req := json.decode(Request, js_str) or { return Request{} }
 	return req
